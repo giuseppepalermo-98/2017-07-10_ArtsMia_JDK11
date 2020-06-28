@@ -1,8 +1,10 @@
 package it.polito.tdp.artsmia;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.artsmia.model.ArtObject;
 import it.polito.tdp.artsmia.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,7 +24,7 @@ public class FXMLController {
     private URL location;
 
     @FXML
-    private ChoiceBox<?> boxLUN;
+    private ChoiceBox<Integer> boxLUN;
 
     @FXML
     private Button btnCalcolaComponenteConnessa;
@@ -41,17 +43,59 @@ public class FXMLController {
 
     @FXML
     void doAnalizzaOggetti(ActionEvent event) {
-
+    	this.txtResult.clear();
+    	
+    	this.model.creaGrafo();
+    	
+    	this.txtResult.appendText("Grafo creato!");
     }
 
     @FXML
     void doCalcolaComponenteConnessa(ActionEvent event) {
-
+    	this.txtResult.clear();
+    	Integer ido;
+    	
+    	try {
+    	 ido = Integer.parseInt(this.txtObjectId.getText());
+    	}
+    	catch(NumberFormatException e) {
+    		this.txtResult.appendText("ID NON VALIDO");
+    		return;
+    	}
+    	
+    	if(model.isPresente(ido))
+    	 this.txtResult.appendText("Le componenti connesse a questo vertice sono: "+model.getConnessi(ido));
+    	else
+    		this.txtResult.appendText("Non esiste un oggeto con l'ID inserito");
+    	
+    	
+    	
+    	for(int i=2; i<model.getConnessi(ido); i++)
+    		this.boxLUN.getItems().add(i);
     }
 
     @FXML
     void doCercaOggetti(ActionEvent event) {
-
+    	this.txtResult.clear();
+    	
+    	Integer ido;
+    	Integer LUN;
+    	try {
+    	 ido = Integer.parseInt(this.txtObjectId.getText());
+    	 LUN = (this.boxLUN.getValue());
+    	 if(model.isPresente(ido)) {
+    		List<ArtObject>result =  this.model.getPercorso(LUN, ido);
+    		
+    		this.txtResult.appendText("Il percorso ha peso pari a "+model.calcolaPeso(result)+" i vertici sono: \n");
+    		for(ArtObject a: result)
+    			this.txtResult.appendText(a.getId()+"\n");
+    		
+    	 }
+    	}
+    	catch(NumberFormatException e) {
+    		this.txtResult.appendText("ID NON VALIDO");
+    		return;
+    	}
     }
 
     @FXML
